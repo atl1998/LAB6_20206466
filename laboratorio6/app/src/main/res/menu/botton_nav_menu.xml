@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/linea1"
+        android:title="Linea1"
+        android:icon="@drawable/ic_bus_1"/>
+    <item
+        android:id="@+id/limaPass"
+        android:title="LimaPass"
+        android:icon="@drawable/ic_bus_1"/>
+    <item
+        android:id="@+id/resumen"
+        android:title="Resumen"
+        android:icon="@drawable/ic_resumen"/>
+    <item
+        android:id="@+id/logout"
+        android:title="CerrarSesion"
+        android:icon="@drawable/ic_logout"/>
+</menu>
