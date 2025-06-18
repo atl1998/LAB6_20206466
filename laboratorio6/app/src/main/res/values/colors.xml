@@ -8,4 +8,5 @@
     <color name="google_text_color">#757575</color>
     <color name="google_border_color">#DADCE0</color>
     <color name="divider_color">#E0E0E0</color>
+    <color name="secondary_text">#757575</color>
 </resources>
