@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -109,52 +110,81 @@ public class ResumenFragment extends Fragment {
         Map<String, Integer> linea1PorMes = new TreeMap<>();
         Map<String, Integer> limaPassPorMes = new TreeMap<>();
 
-        DateFormat formato = new SimpleDateFormat("yyyy-MM", Locale.getDefault());
+        DateFormat formatoMes = new SimpleDateFormat("yyyy-MM", Locale.getDefault());
+        SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-        // Agrupar por mes
+        // Agrupar viajes de Línea 1 por mes
         for (Linea1 l : linea1) {
             try {
-                String mes = formato.format(new SimpleDateFormat("yyyy-MM-dd").parse(l.getFecha()));
+                String mes = formatoMes.format(formatoFecha.parse(l.getFecha()));
                 linea1PorMes.put(mes, linea1PorMes.getOrDefault(mes, 0) + 1);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
 
+        // Agrupar viajes de Lima Pass por mes
         for (LimaPass l : limaPass) {
             try {
-                String mes = formato.format(new SimpleDateFormat("yyyy-MM-dd").parse(l.getFecha()));
+                String mes = formatoMes.format(formatoFecha.parse(l.getFecha()));
                 limaPassPorMes.put(mes, limaPassPorMes.getOrDefault(mes, 0) + 1);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
 
+        // Unir los meses únicos de ambas fuentes
+        Set<String> mesesUnificados = new TreeSet<>();
+        mesesUnificados.addAll(linea1PorMes.keySet());
+        mesesUnificados.addAll(limaPassPorMes.keySet());
+
         List<BarEntry> linea1Entries = new ArrayList<>();
         List<BarEntry> limaPassEntries = new ArrayList<>();
         List<String> mesesLabels = new ArrayList<>();
-        int index = 0;
 
-        for (String mes : new TreeSet<>(linea1PorMes.keySet())) {
+        // Parámetros de espacio para agrupación
+        float groupSpace = 0.4f;
+        float barSpace = 0.05f;
+        float barWidth = 0.25f;
+
+        float x = 0f;
+        for (String mes : mesesUnificados) {
             mesesLabels.add(mes);
-            linea1Entries.add(new BarEntry(index, linea1PorMes.getOrDefault(mes, 0)));
-            limaPassEntries.add(new BarEntry(index, limaPassPorMes.getOrDefault(mes, 0)));
-            index++;
+            linea1Entries.add(new BarEntry(x, linea1PorMes.getOrDefault(mes, 0)));
+            limaPassEntries.add(new BarEntry(x, limaPassPorMes.getOrDefault(mes, 0)));
+            x += 1f;
         }
 
+        // Crear conjuntos de barras
         BarDataSet set1 = new BarDataSet(linea1Entries, "Línea 1");
+        set1.setColor(Color.parseColor("#1976D2"));
         BarDataSet set2 = new BarDataSet(limaPassEntries, "Lima Pass");
+        set2.setColor(Color.parseColor("#F57C00")); // Naranja
 
+        // Configurar datos de gráfico
         BarData data = new BarData(set1, set2);
-        data.setBarWidth(0.4f); // Espaciado
+        data.setBarWidth(barWidth);
 
+        // Configurar eje X
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(mesesLabels));
+        xAxis.setGranularity(1f);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setCenterAxisLabels(true);
+        xAxis.setAxisMinimum(0f);
+        xAxis.setAxisMaximum(mesesUnificados.size()); // ← importante para mostrar todas las barras
+
+        // Configurar gráfico
         barChart.setData(data);
-        barChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(mesesLabels));
-        barChart.getXAxis().setGranularity(1f);
-        barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        barChart.groupBars(0f, 0.2f, 0.02f); // agrupar barras
-        barChart.invalidate();
+        barChart.groupBars(0f, groupSpace, barSpace);
+        barChart.setFitBars(true);
+        barChart.getDescription().setEnabled(false);
+        barChart.getAxisRight().setEnabled(false);
+        barChart.getLegend().setWordWrapEnabled(true);
+        barChart.setBackgroundColor(Color.WHITE);
+        barChart.invalidate(); // Redibujar
     }
+
 
     private void graficarTortaPorUso(int totalLinea1, int totalLimaPass) {
         List<PieEntry> entries = new ArrayList<>();
