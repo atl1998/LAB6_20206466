@@ -26,7 +26,6 @@ import com.google.firebase.auth.FirebaseAuth;
 public class LogoutFragment extends Fragment {
 
     public LogoutFragment() {
-        // Constructor vacío obligatorio
     }
 
     @Nullable

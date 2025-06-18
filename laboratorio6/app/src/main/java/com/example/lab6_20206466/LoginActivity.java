@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,6 +43,45 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //iniciar sesion con correo y contraseña
+        EditText emailEditText = findViewById(R.id.emailEditText);
+        EditText passwordEditText = findViewById(R.id.passwordEditText);
+        Button loginButton = findViewById(R.id.loginButton); // Botón manual de login
+
+        loginButton.setOnClickListener(v -> {
+            String email = emailEditText.getText().toString().trim();
+            String password = passwordEditText.getText().toString().trim();
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                    .addOnSuccessListener(authResult -> {
+                        FirebaseUser user = authResult.getUser();
+                        if (user != null) {
+                            Log.d(TAG, "Login exitoso con correo: " + user.getEmail());
+                            startActivity(new Intent(this, MainActivity.class));
+                            finish();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Error al iniciar sesión", e);
+                        Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    });
+        });
+
+
+        //registro nuevos usuarios
+        TextView registerButton = findViewById(R.id.registerButton);
+        registerButton.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
+        });
+
+
+        //iniciar sesion cn google
         googleLoginButton = findViewById(R.id.googleLoginButton);
 
         googleLoginButton.setOnClickListener(v -> {

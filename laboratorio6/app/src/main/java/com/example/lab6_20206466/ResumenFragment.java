@@ -182,7 +182,7 @@ public class ResumenFragment extends Fragment {
         barChart.getAxisRight().setEnabled(false);
         barChart.getLegend().setWordWrapEnabled(true);
         barChart.setBackgroundColor(Color.WHITE);
-        barChart.invalidate(); // Redibujar
+        barChart.invalidate();
     }
 
 
